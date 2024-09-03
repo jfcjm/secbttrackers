@@ -1,0 +1,9 @@
+*.pdf
+*.csv
+*.log
+*.aux
+*.out
+*~
+*.fdb_latexmk
+*.fls
+auto/

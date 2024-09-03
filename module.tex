@@ -1,0 +1,419 @@
+\documentclass[headings=small,cmyk,french,a4paper,twocolumn,garamond,11pt]{scrartcl}
+\usepackage[total={177mm,260mm},marginparwidth=0pt,marginparsep=0pt,showframe=false]{geometry}\usepackage{scrjura}
+\usepackage{babel}
+\usepackage{glossaries}
+\usepackage[dvipsnames,cmyk]{xcolor}
+\usepackage{microtype}
+% \AddtoOneTimeDoHook{heading/begingroup}{\setheadingcolor{#1}}
+% \newcommand*{\setheadingcolor}[2]{\addtokomafont{#2}{\color{#1}}}
+\addtokomafont{section}{\color{BrickRed}}
+\usepackage{datatool}
+\usepackage{environ}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\DTLnewdb{exigences}
+\newcounter{toto}[subsection]
+
+\input{acronyms.tex}
+\title{Module sécurité : balises de traçage radios}\date{}
+\begin{document}
+\maketitle{}
+\section{Description}
+\subsection{Introduction}
+Les balises de traçage radios (tracker tags)  sont des objets connectés
+autonomes qui, liés à des biens matériels, promettent à leurs
+propriétaires d'en éviter l'oubli ou d'en faciliter les recherches en
+cas de perte ou de vol.
+
+Les capacités de ces balises reposent sur l'utilisation de connexions
+radio (\acrshort{BLE},  \acrshort{UWB}) entre la balise et un
+\emph{équipement mobile maître} (téléphone, tablette) détenu par le  propriétaire.
+% permettent de suivre par radio, sur une distance moyenne,
+% la localisation d'un bien. La liaison entre la balise est le bien
+% tracé s'effectue généralement par collage, lien d'attache ou
+% porte-clefs.
+
+% Cette capacité de localisation radio est destinée à éviter l'oubli du
+% bien et à faciliter les recherches en cas de disparition (perte ou vol) de
+% ce bien.
+\paragraph{Fonctionnement de proximité}
+Réalisées par différents constructeurs, ces balises reposent sur un
+principe similaire de fonctionnement : une balise est appariée par
+protocole radio à un ou plusieurs \emph{équipements mobiles maîtres} dont
+elles doivent rester proches. La balise est \textsl{«silencieuse»}
+tant qu'elle est connectée à l'un de ses équipements maîtres.  Lorsque
+la balise n'est plus connectée, elle diffuse publiquement sa situation
+afin de pouvoir être facilement localisée.
+
+Le fonctionnement de proximité des systèmes de balise repose donc sur
+l'installation d'une application dédiée sur l'\emph{équipement maître}. Cette
+application permet initialement de configurer la balise, puis en état
+de marche, de gérer la connexion radio du mobile avec la balise,
+d'afficher les notifications et enfin de guider le propriétaire en cas
+de recherche.
+\paragraph{Fonctionnement à grande échelle}
+Le fonctionnement de proximité est complété par une capacité de
+recherche à grande échelle : la diffusion publique par la balise de sa
+situation permet à de multiples équipements tiers compatibles de la
+localiser. Ces équipements tiers sont alors en mesure de propager la
+situation de la balise à un serveur distant opéré par le
+constructeur. Ce mode de localisation, désigné par l'expression
+«localisation participative» (\emph{crowdsourced network}) peut
+permettre au propriétaire de retrouver le bien égaré ou volé même s'il
+n'est plus dans la portée radio de ses équipements maîtres.
+
+La mise en oeuvre de la capacité de recherche à grande échelle repose
+non seulement sur l'existence de liens radio de proximité ainsi que
+d'une application dédiée de gestion sur le téléphone, mais aussi sur
+la mise à disposition, par le fournisseur de la balise, d'un service
+distant de suivi de position, éventuellement présenté sous forme
+cartographique.
+
+Les différents systèmes de localisation ne sont pas, en général,
+intéropérables: le systèmes de suivi à grande échelle d'un vendeur
+n'est pas compatible avec ceux d'autres vendeurs.
+
+
+% Les balises ne sont pas des dispositifs d'intérêt en elles-mêmes mais
+% au travers de l'accessoire auquel elles sont associées.
+\subsection{Objectifs}
+
+\subsection{Périmètre du module}
+Ce module ne s'applique qu'aux balises \gls{BLE} dont l'identification
+est restreinte tant qu'elles sont dans la portée d'une plate-forme
+maître.
+
+En particulier, ce module ne s'applique pas pas aux balises de
+localisation utilisées dans un cadre logistique ni aux balises
+autonomes qui possèdent des capacités de traitement élevées (GPS,
+connexion réseau étendue) ni aux systèmes radio de courte portée tels
+que les système NFC ou RFID.
+
+% La brique «Balises de traçage radios» devrait être complétée par
+% différentes briques de sécurité : «équipements mobiles», «équipements
+% IOT», «gestion des matériels à visée domestique».
+\section{Panorama de la menace}
+\subsection{Divulgation de finalité}
+L'appariement d'une balise s'effectue en associant une description 
+du bien tracé, par exemple \textsl{«Télécommande de pilotage du
+  système antivol»}. En cas de divulgation, cette désignation pourrait
+réveler des informations essentielles sur la valeur du bien.
+
+\subsection{Divulgation  de position}
+Les biens associés à une balise peuvent être parfois déposés
+dans un endroit considéré comme «sûr» en raison de son emplacement
+confidentiel.  Si l'équipement maître de la balise n'est pas déposé en
+proximité, la balise va signaler sa position et pourrait ainsi révèler
+l'existence et la position du lieu de dépôt.
+% qLe personnel affectataire de l'accessoire tracé doit être en
+% possession de'un équipement mobile d'appariement afin qu'il ne soit
+% pas continuement sous surveillance, il ne suffit pas d'apparier la
+% balise avec le téléphone d'un gestionnaire.
+
+\subsection{Intrusivité des applications de gestion}
+Une balise n'embarque pas de dispositif GPS, elle ne possède donc
+aucune capacité de localisation géographique. Ces capacités
+géographiques  sont fournies par l'équipement maître auquelle elle
+est est appariée.
+
+La réalisation de la capacité de localisation au sein du système
+repose donc sur l'activation, plus ou moins fine, des fonctions de
+géolocalisation sur les équipements maîtres.
+
+De plus, l'activation d'autres fonction plus ou moins intrusives
+peuvent aussi être nécessaires au fonctionnement de l'application.
+
+\subsection{Activation des protocoles radios}
+
+La fonction d'appariement des matériels maîtres exige que le protocole
+\acrshort{BLE} soit systématiquement activé sur les équipements maîtres.
+Comme les protocoles de la famille \acrshort{BLE} font périodiquement
+l'objet de divulgation de vulnérabilités, cette activation augmente
+considérablement la surface d'attaque des matériels concernés.
+
+\subsection{Consommation de ressources}
+Les balises sont conçues pour être économes en énergie.  Ce n'est
+pas le cas pour les appareils maîtres qui, lorsque le protocole
+\acrshort{BLE} et la géolocalisation sont activés, doivent répondre à de
+nombreuses sollicitations. L'autonomie des appareils maîtres sera donc
+diminuée dès la mise en place d'une association avec une nouvelle
+balise.
+
+\subsection{Persistence  de l'identifiant réseau}
+Les identifiants réseau utilisés par les balises pour leurs connexions
+réseau peuvent être persistants ou aléatoires. Dans le premier cas, la
+persistance expose la balise à la possibilité d'un suivi continu de sa
+localisation et de celle de son porteur.
+\subsection{Déficiences de fonctionnement}
+Le suivi à grande échelle pourraient être mis en défaut si le nombre
+de participants au réseau participatif n'est pas assez élevé ou si les
+détenteurs de plate-formes compatibles n'ont pas activé les fonctions
+adéquates sur leurs équipements mobiles.
+
+La détention d'une balise et de son application de gestion peuvent ne
+pas suffire pas à disposer de toutes les fonctions, fonctions
+supplémentaires qui ne sont activées que sur contrat de souscription.
+
+
+
+\subsection{Maintien en condition de sécurité}
+Le logiciel embarqué dans les balises \acrshort{BLE} possède des capacités
+limités. Ce logiciel est cependant susceptible de comporter des
+défauts ou bien de devoir être modifié pour suivre les évolutions des
+protocoles de gestion. Afin d'être maintenu en condition de
+sécurité, le logiciel embarqué des balises doit pouvoir être mis à
+jour afin de suivre ses évolutions du constructeur.
+
+\subsection{Absence, par conception, de mesures anti vie privée }
+Les balises de traçage sont parfois utilisée pour réaliser un suivi
+abusif de personnes (harcèlement) , comme en témoignent plusieurs affaires
+judiciaires.
+
+En réaction, pour que les victimes potentielles puissent constater un
+traçage abusif, les constructeurs facilitent volontairement la
+détection de balises par des tierces personnes.
+
+L'existence de ces mesures est en contradiction avec les principes de
+préservation des droits et des libertés fondamentales au regard de la
+vie privée et des traitements de données à caractère personnel.
+
+\subsection{Difficulté de multipropriété}
+La plupart des fournisseurs associent ces balises à un compte
+identifié sur leurs serveurs. Cette identification fine du
+propriétaire permet à la fois de déclarer automatiquement les
+plate-formes maîtres de la balise et de faciliter l'identification du
+responsable d'un suivi abusif de personne.
+
+Cependant, dans un cadre organisationnel, ces mesures ne permettent pas
+de discriminer finement les personnes qui ont accès au service distant
+de gestion . Ces mesures peuvent aussi poser des problèmes de
+couverture si l'ensemble des  équipements de l'organisation sont
+enregistrées avec le même identifiant client.
+
+
+\subsection{Suivi continu des personnes affectataires}
+Une balise diffuse publiquement sa situation lorsqu'elle est hors de
+portée de ses équipements pairs. Cette diffusion peut mener à une
+suivi systématique de la localisation du bien et de son
+porteur. Le suivi systématique d'un personnel, d'un usager ou d'une
+tierce pourrait poser des problèmes juridiques.
+% \subsection{DCP  des gestionnaires}
+% L'interférence des applications de gestion (application téléphone,
+% application serveur) doit être prise en compte dans le cadre du
+% processus de sélection des balises.
+
+\subsection{Défaut inattendu d'appariement }
+Une balise signale sa situation après un certain délai lorsque'elle
+n'est plus connectée à son équipemet maître. Ce défaut d'appariement
+peut se produire lorsque l'équipement pair ne dispose plus d'énergie ou
+lorsqu'il doit faire l'objet d'une opération de maintenance.
+
+\subsection{Détournement de finalité}
+Une balise pourrait être utilisée à des fins de traçage de bien ou de
+personnes en dehors de tout besoin organisationnel.
+
+\section{Exigences}
+Cette section décrit les exigences de sécurité relative au déploiement
+de balises de traçage au sein de l'établissement. Le RSSI est chargé
+de vérifier que ces exigences sont satifaites et que leur mise en
+eouvre est cohérente avec les objectifs de sécurité.
+
+Les rôles et responsabilités relatifs à ce module sont les
+suivants :
+\begin{description}
+\item[responsable métier] personne responsable du service ou de
+  l'unité organisationnelle en charge de l'affectation et du suivi des
+  balises;
+\item[affectataire] personne (personnel, usager, sous-traitant) à
+  laquelle est affecté un bien associé à une balise;
+\item[gestionnaire technique] service en charge de la vérification du
+  fonctionnement des types de balise et du maintien en condition de
+  sécurité des équipments mobiles maîtres de la balise
+\end{description}
+\stepcounter{toto}%\arabic{toto}
+\newcommand{\dbadd}[1]{
+  \stepcounter{toto}%
+  \DTLnewrow{exigences}%
+  \dtlexpandnewvalue%
+  \DTLnewdbentry{exigences}{Id}{E--\arabic{subsection}.\arabic{toto}}%
+  \DTLnewdbentry{exigences}{Réf.}{\ref{E.\arabic{subsection}}}%
+  \DTLnewdbentry{exigences}{Question}{#1}%
+  \DTLnewdbentry{exigences}{N/A}{\fbox{~}}%
+  \DTLnewdbentry{exigences}{Oui/Non}{\fbox{~}}%
+}
+
+
+
+
+
+\let\oldsubsection\subsection
+\renewcommand{\subsection}[2][]{\oldsubsection[#1]{#2}\label{E.\arabic{subsection}}}
+%\renewcommand{\subsection}[1]{\oldsubsection}
+\subsection{Centralisation de  gestion}
+\dbadd{La gestion des balises de traçage est centralisée}
+\dbadd{Les agents gestionnaire du suivi sont habilités}
+\dbadd{Les accès au serveur de gestion des balises sont individuels}
+% \DTLnewrow{exigences}
+% \DTLnewdbentry{exigences}{Id}{E.\thesubsection}
+% \DTLnewdbentry{exigences}{Question}{La gestion des balises de tracage est  centralisée}
+Un seul service organisationnel doit être responsable de la
+configuration initiale, de l'affectation et du suivi des balises;
+
+Les agents en charge du suivi des balises doivent être formellement
+habilités à le faire. Le compte de gestion de la composante serveur du
+système de localisation ne devrait pas être mutualisé, chaque accès
+devrait être personnel.
+\subsection{Maintien en condition de sécurité}
+\dbadd{Le maintien en condition de sécurité est prévu dans le contrat ou dans les CGU}
+\dbadd{Le firmware des balises peut être mis-à-jour}
+\dbadd{Une page web dédiée à la sécurité des balises est hébergée par le fournisseur}
+
+Les équipements acquis doivent pouvoir être mis à jour en cas de
+défaut de sécurité. Cette possibilité de mise à jour doit être
+explicitement décrite dans le contrat sépcifique d'acquisition ou les
+conditions générales de vente.
+
+Une page web dédiée à la sécurité des balises et de leur logiciel de
+gestion devrait être mise à disposition par le vendeur.
+
+\subsection{Utilisation de matériels maîtres professionnels}
+\dbadd{Les équipements maîtres de la balise ne sont pas des matériels personnels}
+
+Les téléphones, les ordinateurs ou les tablettes maîtres de la balise
+doivent être des matériels professionnels gérés par l'établissement,
+les applications de gestion ne doivent pas être installées sur des
+téléphones domestiques (personnels).
+\subsection{Intrusivité des applications mobiles de gestion}
+\dbadd{L'intrusivité de l'application de gestion mobile des balises a été évaluée}
+
+L'intrusivité des applications de gestion --- trackers, périmètre des
+autorisation exigées, interaction avec d'autres applications, couplage
+avec le système d'exploitation --- devrait être prise en compte dans les
+critères de choix de la solution.
+
+\subsection{Intrusivité des applications serveurs}
+\dbadd{L'intrusivité de l'application de gestion serveur des balises a été évaluée}
+
+L'intrusivité des applications serveurs relativement aux droits et
+libertés des personnels en charge de la gestion des balise devrait
+être évaluée et prise en compte dans les critères de choix de la
+solution.
+\subsection{Utilisation d'une adresse mail dédiée pour la gestion}
+\dbadd{L'adresse mail de contact associée aux balises est une adresse dédiée}
+
+Si le renseignement d'une adresse mail est demandée lors du
+paramétrage de la balise, une adresse mail fonctionnelle dédiée à la
+gestion des balises doit être utilisée.
+
+\subsection{Insignifiance des descriptions}
+\dbadd{La description des balises est un texte neutre qui ne dévoile pas la finalité du bien associé}
+
+Les descriptions des biens tracés ne devraient pas posséder de sens
+précis afin qu'une divulgation de ces descriptions ne permette pas à
+une tierce partie de déduire l'utilisation qu'il peut faire du bien
+tracé.
+
+\subsection{Sécurisation des appariements en cas de défaut d'alimentation}
+\dbadd{Une batterie de secours pour l'équipement maître a été adffectée en même temps que celui-ci}
+
+Les personnes affectataires devraient pouvoir recharger l'équipement
+maître à tout moment afin d'éviter un désappariement. En raison de
+l'augmentation de la consommation due à l'activation du \acrshort{BLE}
+et de la géolocalisation, une batterie de secours devrait être mise à
+leur disposition en même temps que les autres matériels.
+
+\subsection{Sécurisation les appariements en cas de maintenance}
+\dbadd{Le désappariement de la balise a été prévu en cas de maintenance de l'équipement maître}
+
+Les activités de maintenance doivent prendre en compte la possibilité
+d'un désappariement de la balise, le déroulé de ces activités devrait
+être formalisé.
+
+\subsection{Sensibilité des lieux de lieux de stockage de biens}
+\dbadd{Le stockage de la balise ne risque pas de dévoiler la localisation d'un lieu de dépôt confidentiel}
+
+Le cas échéant, la sécurisation/sensibilité des stockages temporaires
+de biens (boîte à clés de bâtiment, \ldots) suivis par balise doit
+être étudiée afin de déterminer si ces balises doivent être
+désactivées lors de ces dépôts et/ou si le lieu considéré doit faire
+l'objet d'une sécurisation supplémentaire.
+
+
+\subsection{Procédure de gestion des pertes de bien}
+\dbadd{Les actions a entreprendre en cas de perte de bien ont été prévues}
+
+Une procédure de traitement doit être définie en cas de signalisation
+de désappariement.  Cette procédure doit engager le personnel
+affectataire de la balise qui doit être informé de son déroulement.
+
+\subsection{Désactivation de  balise}
+\dbadd{Les conditions de désactivation de la balise sur demande de l'affectataire sont prévues}
+
+Les gestionnaires en charge des balises devrait pouvoir être en mesure
+de désactiver une balise sur demande motivée de l'affectataire.
+
+\onecolumn{}
+% \renewcommand{\dtlbeforecols}{\protect\hline}
+\renewcommand{\dtlbeforecols}{|}
+\renewcommand{\dtldisplaystarttab}{\hline}
+\renewcommand{\dtldisplayafterhead}{\hline}
+\begin{landscape}
+  \section*{Évaluation}
+  \DTLdisplaydb{exigences}
+  \section*{Remarques}
+\end{landscape}
+
+%\section{Menaces élémentaires}
+%\begin{itemize}
+%\item Défaut ou interruption d'alimentation électrique
+%\item Défaut ou interruption de réseau de communication
+%\item Défaut ou interruption d'un fournisseur de service
+% \item Interférence électro-magnétique
+% \item Interception ou compromission  d'interférence
+%\item Divulgation d'information, espionnage
+% \item Écoute discrète
+%\item Vol d'équipement, de périphérique de stockage ou de documents
+%\item Perte  d'équipement, de périphérique de stockage ou de documents
+%\item Défaut de planification ou manque d'adaptation
+%\item Divulgation d'informations sensibles
+% \item Source non fiable d'information ou de produits
+% \item Falsification logicielle ou matérielle
+% \item Falsification d'informations
+% \item Accès abusif à un système informatique
+% \item Destruction de matériels ou de périphérique de stockage
+% \item Panne matérielle ou système
+% \item Dysfonctionnement matériel ou système
+% \item Défaut de ressources
+% \item Vulnérabilité ou erreurs logicielles
+% \item Violation de loi ou de réglement
+% \item Utilisation abusive ou accès administrateur à un matériel ou un système
+% \item Utilisation incorrecte d'un matériel ou d'un systèmùe
+% \item Abus d'autorisation
+% \item Défaut de personnel
+% \item Attaque
+% \item Coercition, chantage ou corruption
+% \item Usurpation d'identité
+% \item Répudiation d'action
+% \item Abus d'utilisation d'information à caractère personnel
+% \item Logiciel malicieux 
+% \item Dénis de service
+% \item Sabotage
+% \item Ingéniérie sociale
+% \item Attaque par falsification de messages
+% \item Passage non autorisé
+% \item Perte de données
+% \item Perte d'intégrité d'informations sensibles
+% \item Effets secondaire nocifs d'une attaque orientée SI
+
+%\end{itemize}
+
+
+\end{document}
+
+
+
+%%% Local Variables:
+%%% TeX-parse-self: t
+%%% TeX-auto-save: t
+%%% TeX-engine: luatex
+%%% End: 
