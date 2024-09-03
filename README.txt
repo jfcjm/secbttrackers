@@ -1,2 +1,2 @@
-Le document module.tex contient une présentation des exigencesde de sécurité
-relative aux trackers bluetooth (de type airtag, tile, smartTag2 ou autre).
+Le document module.tex contient une présentation des exigences de sécurité
+relatives aux trackers bluetooth (de type airtag, tile, smartTag2 ou autre).
